@@ -1,0 +1,32 @@
+
+[project]
+name = "eks_jupyterhub"
+version = "0.0.0"
+description = "An AWS CDK app for JupyterHub on EKS."
+authors = [
+    {name = "Grayden Shand", email = "gshand@beta.team"},
+]
+dependencies = [
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "aws-cdk-lib==2.88.0",
+    "boto3>=1.28.12",
+    "PyYAML>=6.0.1",
+    "black>=23.7.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+]
+
+[tool.pdm.scripts]
+format.shell = "black . && isort ."
+deploy.shell = "cdk deploy -O output.json"
+
+[tool.black]
+line-length=120
+
+[tool.mypy]
+files=["cdk.py"]
