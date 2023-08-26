@@ -83,6 +83,7 @@ class JupyterHubStack(cdk.Stack):
             service_account_role_arn=ebs_csi_addon_role.role_arn,
         )
 
+        # Grant masters role necessary permissions
         masters_role.add_to_policy(
             iam.PolicyStatement(
                 actions=["eks:AccessKubernetesApi", "eks:Describe*", "eks:List*"],
@@ -90,6 +91,7 @@ class JupyterHubStack(cdk.Stack):
             )
         )
 
+        # Deploy Jupyterhub helm chart
         with open("config.yaml", "r") as f:
             eks.HelmChart(
                 self,
@@ -104,6 +106,15 @@ class JupyterHubStack(cdk.Stack):
                 wait=True,
                 values=yaml.load(f, Loader=yaml.Loader),
             )
+
+        # Expose service endpoint as stack output
+        jupyterhub_endpoint = cluster.get_service_load_balancer_address("proxy-public", namespace="jupyterhub")
+        cdk.CfnOutput(
+            self,
+            "JupyterhubEndpoint",
+            value=jupyterhub_endpoint,
+            description="The web address of the Jupyterhub load balancer.",
+        )
 
 
 if __name__ == "__main__":

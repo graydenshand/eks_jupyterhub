@@ -2,11 +2,15 @@
 
 An example JupyterHub deployment on EKS.
 
+For full details on configuration options and security best practices, please refer to the [Jupyterhub on Kubernetes 
+documentation](https://z2jh.jupyter.org/en/stable/index.html).
+
 ## Dependencies
 
 * NodeJS & `aws-cdk` package
 * Python>=3.11
 * [PDM](https://pypi.org/project/pdm/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/) (optional, but recommended)
 
 ## Installation
 
@@ -40,40 +44,11 @@ user-scheduler-7574d67cdb-f89m2   1/1     Running             0          8s
 user-scheduler-7574d67cdb-fgv9n   1/1     Running             0          8s
 ```
 
-Once all pods are running, get your proxy endpoint.
-```
-$ kubectl --namespace=jupyterhub describe service proxy-public
-Name:                     proxy-public
-Namespace:                jupyterhub
-Labels:                   app=jupyterhub
-                          app.kubernetes.io/managed-by=Helm
-                          chart=jupyterhub-3.0.1
-                          component=proxy-public
-                          heritage=Helm
-                          release=jupyterhub
-Annotations:              meta.helm.sh/release-name: jupyterhub
-                          meta.helm.sh/release-namespace: jupyterhub
-Selector:                 app=jupyterhub,component=proxy,release=jupyterhub
-Type:                     LoadBalancer
-IP Family Policy:         SingleStack
-IP Families:              IPv4
-IP:                       172.20.113.234
-IPs:                      172.20.113.234
-LoadBalancer Ingress:     abcd12345678fedcba87654321-1044896179.us-east-1.elb.amazonaws.com
-Port:                     http  80/TCP
-TargetPort:               http/TCP
-NodePort:                 http  31530/TCP
-Endpoints:                10.0.220.27:8000
-Session Affinity:         None
-External Traffic Policy:  Cluster
-Events:
-  Type    Reason                Age   From                Message
-  ----    ------                ----  ----                -------
-  Normal  EnsuringLoadBalancer  12m   service-controller  Ensuring load balancer
-  Normal  EnsuredLoadBalancer   12m   service-controller  Ensured load balancer
-```
+Once all pods are running, you can view your jupyterhub deployment by going to the address found in your output.json.
+Specifically you're looking for the output named `JupyterhubEndpoint`, it will look something like
+`abcd12345678fedcba87654321-1044896179.us-east-1.elb.amazonaws.com`.
 
-Look for the value of **LoadBalancer Ingress**, now go to that address in your web browser.
+Go to that address in your web browser.
 E.g. http://abcd12345678fedcba87654321-1044896179.us-east-1.elb.amazonaws.com.
 
 Once there, type in any username and password and you can lauch a user server and start creating notebooks.
