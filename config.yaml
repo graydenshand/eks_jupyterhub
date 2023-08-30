@@ -3,18 +3,18 @@
 singleuser:
   # Set defaults for resource guarantees and limits
   storage:
-    capacity: 2Gi
-  
-  # Create different "profiles" which users can sign in to
+    dynamic:
+      storageClass: "efs"
+  memory:
+    limit: "512M"
+    guarantee: "512M"
+  cpu:
+    limit: .5
+    guarantee: .5
+
   profileList:
-    - display_name: "X Small"
+    - display_name: "Extra Small"
       description: "512MB memory, 0.5 CPU"
-      memory:
-        limit: "512M"
-        guarantee: "512M"
-      cpu:
-        limit: .5
-        guarantee: .5
       default: true
     - display_name: "Small"
       description: "1GB memory, 1 CPU"
@@ -24,5 +24,10 @@ singleuser:
           guarantee: 1
           limit: 1
         memory:
-          guranatee: 1G
-          limit: 1G
+          guarantee: 2G
+          limit: 2G
+
+hub:
+  db:
+    pvc:
+      storageClassName: "efs"
