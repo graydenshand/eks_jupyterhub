@@ -1,1 +1,28 @@
-# jupyterhub helm chart config
+# Jupyterhub helm chart config
+
+singleuser:
+  # Set defaults for resource guarantees and limits
+  storage:
+    capacity: 2Gi
+  
+  # Create different "profiles" which users can sign in to
+  profileList:
+    - display_name: "X Small"
+      description: "512MB memory, 0.5 CPU"
+      memory:
+        limit: "512M"
+        guarantee: "512M"
+      cpu:
+        limit: .5
+        guarantee: .5
+      default: true
+    - display_name: "Small"
+      description: "1GB memory, 1 CPU"
+      # Larger resource guarantees and limits for compute heavy workloads
+      kubespawner_override:
+        cpu:
+          guarantee: 1
+          limit: 1
+        memory:
+          guranatee: 1G
+          limit: 1G
