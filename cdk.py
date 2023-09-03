@@ -58,6 +58,20 @@ class JupyterhubStack(cdk.Stack):
             )
         )
 
+        # Build and deploy custom docker image
+        image = ecr_assets.DockerImageAsset(
+            self,
+            "UserServerBaseImage",
+            directory=".",
+            platform=ecr_assets.Platform.LINUX_AMD64,
+        )
+        cdk.CfnOutput(
+            self,
+            "ImageUri",
+            value=image.image_uri,
+            description="URI of image deployed to ECR repository.",
+        )
+
         # Add EFS CSI driver addon
         oid_connect_issuer_id = cluster.open_id_connect_provider.open_id_connect_provider_issuer.replace("https://", "")
         efs_csi_addon_role_policy_condition = cdk.CfnJson(
