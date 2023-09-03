@@ -4,16 +4,15 @@ singleuser:
   storage:
     dynamic:
       storageClass: "efs"
+  memory:
+    limit: "512M"
+    guarantee: "512M"
+  cpu:
+    limit: .5
+    guarantee: .5
   profileList:
-    - display_name: "X Small"
+    - display_name: "Extra Small"
       description: "512MB memory, 0.5 CPU"
-      kubespawner_override:
-        memory:
-          limit: "512M"
-          guarantee: "512M"
-        cpu:
-          limit: .5
-          guarantee: .5
       default: true
     - display_name: "Small"
       description: "1GB memory, 1 CPU"

@@ -17,6 +17,8 @@ AUTOMATIC_BACKUPS = False
 
 
 class JupyterhubStack(cdk.Stack):
+    cluster_service_ipv4_cidr = "172.20.0.0/16"
+
     def __init__(
         self, scope: Construct, id: str, vpc_id: str | None = None, masters_role_arn: str | None = None, **kwargs
     ) -> Self:
@@ -47,7 +49,7 @@ class JupyterhubStack(cdk.Stack):
                 eks.ClusterLoggingTypes.AUTHENTICATOR,
                 eks.ClusterLoggingTypes.CONTROLLER_MANAGER,
             ],
-            service_ipv4_cidr="172.20.0.0/16",
+            service_ipv4_cidr=self.cluster_service_ipv4_cidr,
         )
 
         # Grant masters role necessary permissions
@@ -72,7 +74,35 @@ class JupyterhubStack(cdk.Stack):
             description="URI of image deployed to ECR repository.",
         )
 
-        # Add EFS CSI driver addon
+        # Set up EFS file system and csi addon for notebook storage
+        efs_security_group = ec2.SecurityGroup(
+            self,
+            "EfsSecurityGroup",
+            vpc=cluster.vpc,
+            allow_all_outbound=True,
+        )
+        efs_security_group.add_ingress_rule(
+            ec2.Peer.ipv4(cluster.vpc.vpc_cidr_block),
+            ec2.Port.tcp(2049),
+            description="Allow all inbound NFS traffic from VPC.",
+        )
+        efs_security_group.add_ingress_rule(
+            ec2.Peer.ipv4(self.cluster_service_ipv4_cidr),
+            ec2.Port.tcp(2049),
+            description="Allow all inbound NFS traffic from EKS cluster.",
+        )
+
+        file_system = efs.FileSystem(
+            self,
+            "FileSystem",
+            vpc=cluster.vpc,
+            lifecycle_policy=efs.LifecyclePolicy.AFTER_14_DAYS,
+            out_of_infrequent_access_policy=efs.OutOfInfrequentAccessPolicy.AFTER_1_ACCESS,
+            removal_policy=REMOVAL_POLICY,
+            security_group=efs_security_group,
+            enable_automatic_backups=AUTOMATIC_BACKUPS,
+        )
+
         oid_connect_issuer_id = cluster.open_id_connect_provider.open_id_connect_provider_issuer.replace("https://", "")
         efs_csi_addon_role_policy_condition = cdk.CfnJson(
             self,
@@ -103,33 +133,6 @@ class JupyterhubStack(cdk.Stack):
         )
         efs_csi_addon.apply_removal_policy(REMOVAL_POLICY)
 
-        efs_security_group = ec2.SecurityGroup(
-            self,
-            "EfsSecurityGroup",
-            vpc=cluster.vpc,
-            allow_all_outbound=True,
-        )
-        efs_security_group.add_ingress_rule(
-            ec2.Peer.ipv4(cluster.vpc.vpc_cidr_block),
-            ec2.Port.tcp(2049),
-            description="Allow all inbound NFS traffic from VPC.",
-        )
-        efs_security_group.add_ingress_rule(
-            ec2.Peer.ipv4("172.20.0.0/16"),
-            ec2.Port.tcp(2049),
-            description="Allow all inbound NFS traffic from EKS cluster.",
-        )
-        file_system = efs.FileSystem(
-            self,
-            "FileSystem",
-            vpc=cluster.vpc,
-            lifecycle_policy=efs.LifecyclePolicy.AFTER_14_DAYS,
-            out_of_infrequent_access_policy=efs.OutOfInfrequentAccessPolicy.AFTER_1_ACCESS,
-            removal_policy=REMOVAL_POLICY,
-            security_group=efs_security_group,
-            enable_automatic_backups=AUTOMATIC_BACKUPS,
-        )
-
         eks_namespace = cluster.add_manifest(
             "EksNamespace",
             {
@@ -155,20 +158,6 @@ class JupyterhubStack(cdk.Stack):
         )
         efs_storage_class.node.add_dependency(eks_namespace)
 
-        # Build and deploy custom docker image
-        image = ecr_assets.DockerImageAsset(
-            self,
-            "UserServerBaseImage",
-            directory=".",
-            platform=ecr_assets.Platform.LINUX_AMD64,
-        )
-        cdk.CfnOutput(
-            self,
-            "ImageUri",
-            value=image.image_uri,
-            description="URI of image deployed to ECR repository.",
-        )
-
         # Parse config for Jupyterhub helm chart
         with open("config.yaml", "r") as f:
             config = yaml.load(f, Loader=yaml.Loader)
@@ -188,7 +177,7 @@ class JupyterhubStack(cdk.Stack):
             "password": "aws ecr get-login-password --region us-east-1 | cut -d' ' -f6",
         }
 
-        # # Deploy Jupyterhub helm chart
+        # Deploy Jupyterhub helm chart
         jupyterhub = eks.HelmChart(
             self,
             "JupyterHubHelmChart",
