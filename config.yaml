@@ -9,7 +9,8 @@ singleuser:
     limit: .5
     guarantee: .5
   storage:
-    capacity: 2Gi
+    dynamic:
+      storageClass: "efs"
   
   # Create different "profiles" which users can sign in to
   profileList:
@@ -26,3 +27,8 @@ singleuser:
         memory:
           guranatee: 2G
           limit: 2G
+
+hub:
+  db:
+    pvc:
+      storageClassName: "efs"
