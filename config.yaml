@@ -5,6 +5,13 @@ singleuser:
   storage:
     dynamic:
       storageClass: "efs"
+    extraVolumes:
+      - name: jupyterhub-shared
+        persistentVolumeClaim:
+          claimName: jupyterhub-shared-claim
+    extraVolumeMounts:
+      - name: jupyterhub-shared
+        mountPath: /home/jovyan/shared
   memory:
     limit: "512M"
     guarantee: "512M"

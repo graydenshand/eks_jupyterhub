@@ -158,6 +158,39 @@ class JupyterhubStack(cdk.Stack):
         )
         efs_storage_class.node.add_dependency(eks_namespace)
 
+        efs_shared_volume = cluster.add_manifest(
+            "EfsSharedVolume",
+            {
+                "apiVersion": "v1",
+                "kind": "PersistentVolume",
+                "metadata": {"name": "jupyterhub-shared", "namespace": "jupyterhub"},
+                "spec": {
+                    "capacity": {"storage": "100Gi"},
+                    "volumeMode": "Filesystem",
+                    "accessModes": ["ReadWriteMany"],
+                    "storageClassName": "efs",
+                    "persistentVolumeReclaimPolicy": "Retain",
+                    "csi": {"driver": "efs.csi.aws.com", "volumeHandle": file_system.file_system_id},
+                },
+            },
+        )
+        efs_shared_volume.node.add_dependency(efs_storage_class)
+
+        efs_shared_volume_claim = cluster.add_manifest(
+            "EfsSharedVolumeClaim",
+            {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "metadata": {"name": "jupyterhub-shared-claim", "namespace": "jupyterhub"},
+                "spec": {
+                    "storageClassName": "efs",
+                    "accessModes": ["ReadWriteMany"],
+                    "resources": {"requests": {"storage": "100Gi"}},
+                },
+            },
+        )
+        efs_shared_volume_claim.node.add_dependency(efs_storage_class)
+
         # Parse config for Jupyterhub helm chart
         with open("config.yaml", "r") as f:
             config = yaml.load(f, Loader=yaml.Loader)
@@ -180,7 +213,7 @@ class JupyterhubStack(cdk.Stack):
         # Deploy Jupyterhub helm chart
         jupyterhub = eks.HelmChart(
             self,
-            "JupyterHubHelmChart",
+            "JupyterhubHelmChart",
             cluster=cluster,
             chart="jupyterhub",
             repository="https://jupyterhub.github.io/helm-chart/",
@@ -205,12 +238,12 @@ class JupyterhubStack(cdk.Stack):
 
 if __name__ == "__main__":
     app = cdk.App()
-
+    app_name = "Jupyterhub"
     JupyterhubStack(
         app,
-        "Jupyterhub",
+        app_name,
         termination_protection=DELETION_PROTECTION,
-        tags={"App": "Jupyterhub"},
+        tags={"App": app_name},
     )
 
     app.synth()
