@@ -1,6 +1,6 @@
 # eks_jupyterhub
 
-An example JupyterHub deployment on EKS.
+An example Jupyterhub deployment on EKS.
 
 For full details on configuration options and security best practices, please refer to the [Jupyterhub on Kubernetes 
 documentation](https://z2jh.jupyter.org/en/stable/index.html).
