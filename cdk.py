@@ -33,15 +33,14 @@ class JupyterhubStack(cdk.Stack):
         # Provision a Kubernetes cluster
         cluster = eks.Cluster(
             self,
-            "K8sCluster",
+            "Cluster",
             version=eks.KubernetesVersion.V1_27,
             kubectl_layer=KubectlLayer(self, "kubectl-layer"),
             masters_role=masters_role,
             output_masters_role_arn=True,
             output_cluster_name=True,
             output_config_command=True,
-            default_capacity=1,
-            default_capacity_instance=ec2.InstanceType("m5.large"),
+            default_capacity=0,
             cluster_logging=[
                 eks.ClusterLoggingTypes.SCHEDULER,
                 eks.ClusterLoggingTypes.API,
@@ -58,6 +57,14 @@ class JupyterhubStack(cdk.Stack):
                 actions=["eks:AccessKubernetesApi", "eks:Describe*", "eks:List*"],
                 resources=[cluster.cluster_arn],
             )
+        )
+
+        # Add autoscaling node group
+        cluster.add_nodegroup_capacity(
+            "ClusterNodeGroup",
+            min_size=1,
+            max_size=10,
+            instance_types=[ec2.InstanceType("m5.large")],
         )
 
         # Build and deploy custom docker image
@@ -106,7 +113,7 @@ class JupyterhubStack(cdk.Stack):
         oid_connect_issuer_id = cluster.open_id_connect_provider.open_id_connect_provider_issuer.replace("https://", "")
         efs_csi_addon_role_policy_condition = cdk.CfnJson(
             self,
-            "K8sEfsAddonPolicyCondition",
+            "EfsAddonPolicyCondition",
             value={
                 f"{oid_connect_issuer_id}:aud": "sts.amazonaws.com",
                 f"{oid_connect_issuer_id}:sub": "system:serviceaccount:kube-system:efs-csi-*",
@@ -114,7 +121,7 @@ class JupyterhubStack(cdk.Stack):
         )
         efs_csi_addon_role = iam.Role(
             self,
-            "K8sEfsAddonRole",
+            "EfsAddonRole",
             assumed_by=iam.FederatedPrincipal(
                 federated=cluster.open_id_connect_provider.open_id_connect_provider_arn,
                 conditions={"StringLike": efs_csi_addon_role_policy_condition},
@@ -126,7 +133,7 @@ class JupyterhubStack(cdk.Stack):
         )
         efs_csi_addon = eks.CfnAddon(
             self,
-            "K8sEfsCsiAddon",
+            "EfsCsiAddon",
             addon_name="aws-efs-csi-driver",
             cluster_name=cluster.cluster_name,
             service_account_role_arn=efs_csi_addon_role.role_arn,
@@ -201,7 +208,7 @@ class JupyterhubStack(cdk.Stack):
             "tag": image.image_tag,
         }
 
-        # Create a K8s secret to grant permissions to pull from private ECR registry
+        # Create a  secret to grant permissions to pull from private ECR registry
         config["imagePullSecret"] = {
             "create": True,
             "registry": image.repository.repository_uri,

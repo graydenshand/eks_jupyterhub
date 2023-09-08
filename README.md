@@ -11,10 +11,11 @@ create the following resources in your AWS account:
 * A Docker image in ECR
 * An EFS file system
 * An IAM role
-* A single node EKS cluster running Jupyterhub
+* An autoscaling EKS cluster running Jupyterhub on 1-10 nodes
 
 `config.yaml` contains [Jupyterhub helm chart configurations](https://z2jh.jupyter.org/en/latest/resources/reference.html).
-In addition to setting up the EFS storage integration, it defines two profiles with different cpu and memory settings.
+In addition to setting up the EFS storage integration, it defines two profiles with different cpu and memory settings
+and creates a "shared" directory which all users can access.
 
 `Dockerfile` defines the custom jupyterlab image used in the deployment. Extending Jupyter's 
 [datascience](https://hub.docker.com/r/jupyter/datascience-notebook) base image, it installs four common extensions: 
