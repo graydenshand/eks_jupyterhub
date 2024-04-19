@@ -13,7 +13,7 @@ license = {text = "MIT"}
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "aws-cdk-lib==2.88.0",
+    "aws-cdk-lib>=2.88.0",
     "boto3>=1.28.12",
     "PyYAML>=6.0.1",
     "black>=23.7.0",

@@ -34,7 +34,7 @@ class JupyterhubStack(cdk.Stack):
         cluster = eks.Cluster(
             self,
             "Cluster",
-            version=eks.KubernetesVersion.V1_27,
+            version=eks.KubernetesVersion.V1_29,
             kubectl_layer=KubectlLayer(self, "kubectl-layer"),
             masters_role=masters_role,
             output_masters_role_arn=True,
@@ -227,7 +227,7 @@ class JupyterhubStack(cdk.Stack):
             namespace="jupyterhub",
             create_namespace=True,
             release="jupyterhub",
-            version="3.0.3",
+            version="3.3.7",
             wait=True,
             values=config,
         )

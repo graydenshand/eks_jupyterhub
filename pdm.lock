@@ -3,10 +3,9 @@
 
 [metadata]
 groups = ["default", "dev"]
-cross_platform = true
-static_urls = false
-lock_version = "4.3"
-content_hash = "sha256:7e247142d86a8610ae652ebbc87dc67219f10452d3cb23d45dec27d8031c5c90"
+strategy = ["cross_platform"]
+lock_version = "4.4.1"
+content_hash = "sha256:92b503e77bcd97ea4b9576b9bc781ecf915fd9c24e0d20ae3c240986a28a3765"
 
 [[package]]
 name = "attrs"
@@ -20,17 +19,17 @@ files = [
 
 [[package]]
 name = "aws-cdk-asset-awscli-v1"
-version = "2.2.200"
-requires_python = "~=3.7"
+version = "2.2.202"
+requires_python = "~=3.8"
 summary = "A library that contains the AWS CLI for use in Lambda Layers"
 dependencies = [
-    "jsii<2.0.0,>=1.84.0",
+    "jsii<2.0.0,>=1.93.0",
     "publication>=0.0.3",
     "typeguard~=2.13.3",
 ]
 files = [
-    {file = "aws-cdk.asset-awscli-v1-2.2.200.tar.gz", hash = "sha256:af4d67ef7aa4183073e63be5f88d1ce1912b24d2ebac35148e84678d674bdfcd"},
-    {file = "aws_cdk.asset_awscli_v1-2.2.200-py3-none-any.whl", hash = "sha256:ed1b881402b255daec151e386581a627ce13f4d5cb94b7184e6efc38d27584b0"},
+    {file = "aws-cdk.asset-awscli-v1-2.2.202.tar.gz", hash = "sha256:3ef87d6530736b3a7b0f777fe3b4297994dd40c3ce9306d95f80f48fb18036e8"},
+    {file = "aws_cdk.asset_awscli_v1-2.2.202-py3-none-any.whl", hash = "sha256:96205ea2e5e132ec52fabfff37ea25b9b859498f167d05b32564c949822cd331"},
 ]
 
 [[package]]
@@ -49,37 +48,37 @@ files = [
 ]
 
 [[package]]
-name = "aws-cdk-asset-node-proxy-agent-v5"
-version = "2.0.166"
-requires_python = "~=3.7"
-summary = "@aws-cdk/asset-node-proxy-agent-v5"
+name = "aws-cdk-asset-node-proxy-agent-v6"
+version = "2.0.3"
+requires_python = "~=3.8"
+summary = "@aws-cdk/asset-node-proxy-agent-v6"
 dependencies = [
-    "jsii<2.0.0,>=1.85.0",
+    "jsii<2.0.0,>=1.96.0",
     "publication>=0.0.3",
     "typeguard~=2.13.3",
 ]
 files = [
-    {file = "aws-cdk.asset-node-proxy-agent-v5-2.0.166.tar.gz", hash = "sha256:73d4a4f4bdeb3019779137e4b18d7c5efc8353dff673508bd8c584569ea18db6"},
-    {file = "aws_cdk.asset_node_proxy_agent_v5-2.0.166-py3-none-any.whl", hash = "sha256:d71d80710734c47f7114e3e51843c4a8ebae3bbe5032a5af40ca56ca611c0cfe"},
+    {file = "aws-cdk.asset-node-proxy-agent-v6-2.0.3.tar.gz", hash = "sha256:b62cb10c69a42cab135e6bc670e3d2d3121fd4f53a0f61e53449da4b12738a6f"},
+    {file = "aws_cdk.asset_node_proxy_agent_v6-2.0.3-py3-none-any.whl", hash = "sha256:ef2ff0634ab037e2ebddbe69d7c92515a847c6c8bb2abdfc85b089f5e87761cb"},
 ]
 
 [[package]]
 name = "aws-cdk-lib"
-version = "2.88.0"
-requires_python = "~=3.7"
+version = "2.138.0"
+requires_python = "~=3.8"
 summary = "Version 2 of the AWS Cloud Development Kit library"
 dependencies = [
-    "aws-cdk-asset-awscli-v1<3.0.0,>=2.2.200",
+    "aws-cdk-asset-awscli-v1<3.0.0,>=2.2.202",
     "aws-cdk-asset-kubectl-v20<3.0.0,>=2.1.2",
-    "aws-cdk-asset-node-proxy-agent-v5<3.0.0,>=2.0.165",
+    "aws-cdk-asset-node-proxy-agent-v6<3.0.0,>=2.0.3",
     "constructs<11.0.0,>=10.0.0",
-    "jsii<2.0.0,>=1.85.0",
+    "jsii<2.0.0,>=1.97.0",
     "publication>=0.0.3",
     "typeguard~=2.13.3",
 ]
 files = [
-    {file = "aws-cdk-lib-2.88.0.tar.gz", hash = "sha256:6514217e6485133b30848f11b6c78ec955d41bed4e39e5ba4bea49c379830e56"},
-    {file = "aws_cdk_lib-2.88.0-py3-none-any.whl", hash = "sha256:db4716689cb94e249b8c672139221f1d7866b7d6caca314b52552fa3bacab22c"},
+    {file = "aws-cdk-lib-2.138.0.tar.gz", hash = "sha256:a3f69d1ea22271db4a89a28f3ccf6995c6591586aee0447766933488662a36d1"},
+    {file = "aws_cdk_lib-2.138.0-py3-none-any.whl", hash = "sha256:b528fe909dc0e8686f086369fe38bde6f448efbe9519dc56aef3be35d3da75f7"},
 ]
 
 [[package]]
@@ -217,21 +216,21 @@ files = [
 
 [[package]]
 name = "jsii"
-version = "1.87.0"
-requires_python = "~=3.7"
+version = "1.97.0"
+requires_python = "~=3.8"
 summary = "Python client for jsii runtime"
 dependencies = [
     "attrs<24.0,>=21.2",
-    "cattrs<23.2,>=1.8",
+    "cattrs<23.3,>=1.8",
     "importlib-resources>=5.2.0",
     "publication>=0.0.3",
     "python-dateutil",
     "typeguard~=2.13.3",
-    "typing-extensions<5.0,>=3.7",
+    "typing-extensions<5.0,>=3.8",
 ]
 files = [
-    {file = "jsii-1.87.0-py3-none-any.whl", hash = "sha256:4b7c1331e950af10ba7b71d1c9d2e634b17716b3d1b2bf61e0382ff524d8aafb"},
-    {file = "jsii-1.87.0.tar.gz", hash = "sha256:ba6860c827551901a8c43c7b09a9bb901d5f1231fc4693f2f4bf87b3db200064"},
+    {file = "jsii-1.97.0-py3-none-any.whl", hash = "sha256:5dd347cc9d279072c109829aaff11dae1c7f13169ce60887f1c1ab2c4cd4abcd"},
+    {file = "jsii-1.97.0.tar.gz", hash = "sha256:e6db98e34730cd972d180b7f4e21182b9a5105f537672716940b930ee933a1f2"},
 ]
 
 [[package]]
