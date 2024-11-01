@@ -33,6 +33,7 @@ SYSTEM_AUTOSCALING_GROUP_MAX_SIZE = 5
 USER_AUTOSCALING_GROUP_MIN_SIZE = 0
 USER_AUTOSCALING_GROUP_MAX_SIZE = 10
 
+
 class Vpc(cdk.Stack):
     def __init__(
         self,
@@ -487,9 +488,7 @@ class Application(cdk.Stack):
         config_template = jinja_env.get_template("config.yaml.j2")
         config_secrets_template = jinja_env.get_template("config_secrets.py.j2")
 
-        config_secrets_script = config_secrets_template.render(
-            hub_db_secret_arn=hub_db_secret_arn
-        )
+        config_secrets_script = config_secrets_template.render(hub_db_secret_arn=hub_db_secret_arn)
         config = yaml.full_load(
             config_template.render(
                 user_image_repository_uri=user_image.repository.repository_uri,
