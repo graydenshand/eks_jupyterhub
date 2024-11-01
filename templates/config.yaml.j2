@@ -1,0 +1,57 @@
+# Jupyterhub helm chart config
+
+singleuser:
+  # Set defaults for resource guarantees and limits
+  storage:
+    dynamic:
+      storageClass: "efs"
+    extraVolumes:
+      - name: jupyterhub-shared
+        persistentVolumeClaim:
+          claimName: jupyterhub-shared-claim
+    extraVolumeMounts:
+      - name: jupyterhub-shared
+        mountPath: /home/jovyan/shared
+  # specify service account for iam permissions
+  serviceAccountName: {{ user_service_account_name }}
+  memory:
+    limit: 8G
+    guarantee: 8G
+  cpu:
+    limit: 1
+    guarantee: 1
+  image:
+    name: {{ user_image_repository_uri }}
+    tag: {{ user_image_tag }}
+
+  profileList:
+    - display_name: "Extra Small"
+      description: "8GB memory, 1 CPU"
+      default: true
+    - display_name: "Small"
+      description: "16GB memory, 2 CPU"
+      # Larger resource guarantees and limits for compute heavy workloads
+      kubespawner_override:
+        cpu_guarantee: 2
+        cpu_limit: 2
+        mem_guarantee: 16G
+        mem_limit: 16G
+proxy:
+  traefik:
+    image:
+      name: {{ traefik_image_repository_uri }}
+      tag: {{ traefik_image_tag }}
+
+hub:
+  db:
+    type: postgres
+    upgrade: true
+  image:
+    name: {{ hub_image_repository_uri }}
+    tag: {{ hub_image_tag }}
+imagePullSecret:
+  create: true
+  registry: {{ user_image_repository_uri }}
+  username: aws
+  email: __token__
+  password: aws ecr get-login-password --region us-east-1 | cut -d' ' -f6
