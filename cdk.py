@@ -8,8 +8,6 @@ import aws_cdk.aws_efs as efs
 import aws_cdk.aws_eks as eks
 import aws_cdk.aws_iam as iam
 import aws_cdk.aws_rds as rds
-import aws_cdk.aws_route53 as route53
-import aws_cdk.aws_secretsmanager as secretsmanager
 from aws_cdk import custom_resources as cr
 import yaml
 from aws_cdk.lambda_layer_kubectl import KubectlLayer
@@ -534,25 +532,24 @@ class Jupyterhub(cdk.Stage):
         scope: Construct,
         id: str,
         production: bool,
-        vpc_id: str,
         automatic_backups: bool,
         db_instance_type: ec2.InstanceType,
         user_node_instance_type: ec2.InstanceType,
         system_node_instance_type: ec2.InstanceType,
+        vpc_id: str | None = None,
         tags: dict[str, str] | None = None,
         **kwargs,
     ) -> Self:
         """Initialize a Jupyterhub application.
 
         Args:
-            vpc_id: ID of the vpc in which to create this application
             dns_zone_name: Name of the Route53 hosted zone in which to host this application
             removal_policy: cdk removal policy for resources in this stack
             automatic_backups: Whether or not to enable automatic backups for the EFS file system
             db_instance_type: ec2 instance type of the RDS postgres DB
             user_node_instance_type: ec2 instance type of nodes running user servers in k8s cluster
             system_node_instance_type: ec2 instance type of nodes running system pods in k8s cluster
-            events_api_secret_arn: secretsmanager secret ARN of credentials for events api
+            vpc_id: ID of the vpc in which to create this application, if None, a new vpc will be created
         """
         super().__init__(scope, id, **kwargs)
 
@@ -598,12 +595,11 @@ class Jupyterhub(cdk.Stage):
 if __name__ == "__main__":
     app = cdk.App()
 
-    # Dev
     Jupyterhub(
         app,
         "Jupyterhub",
         production=False,
-        vpc_id="vpc-0e77574dac29b54b8",
+        vpc_id=None,
         automatic_backups=False,
         db_instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE4_GRAVITON, ec2.InstanceSize.MICRO),
         user_node_instance_type=ec2.InstanceType.of(ec2.InstanceClass.M7I, ec2.InstanceSize.XLARGE),
