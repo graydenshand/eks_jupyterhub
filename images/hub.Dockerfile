@@ -1,6 +1,6 @@
 # This is the image used by the jupyterhub Hub pod. The default juptyerhub 
 # base image is extended to install boto3 as a python dependency. This allows
-# looking up our google OAuth2 secret dynamically from secretsmanager on 
+# looking up secretsmanager secrets dynamically from secretsmanager on 
 # pod startup.
 
 # From default jupyterhub hub image
